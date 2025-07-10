@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: parser-configmap
+data:
+  parser-name: "net-a-porter"
+  mode: "listing"

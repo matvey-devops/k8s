@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: result-app-deploy
+  labels:
+    name: result-app-deploy
+    app: cat-dog
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: result-app-pod
+      app: cat-dog
+  template:
+    metadata:
+      name: result-app-pod
+      labels:
+        name: result-app-pod
+        app: cat-dog
+
+    spec:
+      containers:
+      - name: result-app
+        image: kodekloud/examplevotingapp_result:v1
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi

@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-name
+  labels:
+    name: my-name
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: my-name
+  template:
+    metadata:
+      labels:
+        name: my-name
+    spec:
+      nodeSelector:
+        site: da
+      containers:
+      - image: nginx
+        name: nginx-cont
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 20m
+            memory: 55Mi
+          limits:
+            cpu: 500m
+            memory: 300Mi
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 443
+          name: https
+        volumeMounts:
+        - mountPath: /usr/share/nginx/html
+          name: site-volume
+        - mountPath: /cache-2
+          name: cache-volume
+      volumes:
+      - name: site-volume
+        emptyDir: {}
+      - name: cache-volume
+        emptyDir: {}
+      restartPolicy: Always

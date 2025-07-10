@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vault-deployment
+
+spec:
+  replicas: 3
+
+  selector:
+    matchLabels:
+      app: vault-app
+
+  template:
+
+    metadata:
+      labels:
+        app: vault-app
+
+    spec:
+      containers:
+      - name: vault-container
+        image: hashicorp/vault:latest
+        ports:
+        - containerPort: 8200
+          name: vault-api
+        - containerPort: 8201
+          name: vault-cluster
+
+        livenessProbe:
+          httpGet:
+            path: /v1/sys/health
+            port: vault-api
+          initialDelaySeconds: 60
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 10
+          successThreshold: 1
+        readinessProbe:
+          httpGet:
+            path: /v1/sys/health?standbyok=true # ✅ Принимает standby узлы
+            port: vault-api
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 2
+          successThreshold: 1
+
+        resources:
+          limits:
+            memory: 1Gi
+            cpu: 1000m
+          requests:
+            memory: 512Mi
+            cpu: 500m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vault-service
+spec:
+  selector:
+    app: vault-app
+  ports:
+  - name: vault-api
+    port: 80
+    targetPort: vault-api

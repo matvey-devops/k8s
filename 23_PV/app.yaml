@@ -1,0 +1,26 @@
+# apiVersion: v1
+# kind: Pod
+# metadata:
+#   name: app-write-file
+#   labels:
+#     app: write-file
+
+# spec:
+#   containers:
+#   - name: write-container
+#     image: busybox
+#     command: [ "/bin/sh" ]
+#     args:
+#     - "-c"
+#     - "touch '/files/$(HOME)' && echo 'File created' && sleep 10000"
+#     resources:
+#       limits:
+#         cpu: 200m
+#         memory: 100Mi
+#     volumeMounts:
+#     - name: files-pv
+#       mountPath: /files
+#   volumes:
+#   - name: files-pv
+#     persistentVolumeClaim:
+#       claimName: local-pvc

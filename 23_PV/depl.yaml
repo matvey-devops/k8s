@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: app-write-file-deploy
+  labels:
+    name: app-write-file-deploy
+spec:
+  replicas: 2
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        name: app-write-file
+    spec:
+      containers:
+      - image: busybox
+        name: write-container
+        command: [ "/bin/sh" ]
+        args:
+        - -c
+        - touch '/files/$(date)' && echo ok && sleep 10000
+        resources:
+          limits:
+            cpu: 200m
+            memory: 512M
+        volumeMounts:
+        - mountPath: /files
+          name: files-pv
+      volumes:
+      - name: files-pv
+        persistentVolumeClaim:
+          claimName: local-pv
+      restartPolicy: Always
+      imagePullPolicy: IfNotPresent

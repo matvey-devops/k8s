@@ -1,0 +1,31 @@
+# Git файлы
+.git
+.gitignore
+
+# Временные файлы
+*.tmp
+*.temp
+*.log
+
+# Go файлы
+*.test
+*.out
+vendor/
+
+# IDE файлы
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS файлы
+.DS_Store
+Thumbs.db
+
+# Docker файлы
+Dockerfile
+.dockerignore
+
+# Kubernetes файлы
+*.yaml
+*.yml 

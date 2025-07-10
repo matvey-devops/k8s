@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: system-logs-daemonset
+  labels:
+    app: system-telemetry-daemonsets
+    component: system-logs
+spec:
+  selector:
+    matchLabels:
+      app: system-telemetry
+      component: system-logs-pod
+  template:
+    metadata:
+      name: system-logs-daemon-pod
+      labels:
+        app: system-telemetry
+        component: system-logs-pod
+    spec:
+      nodeSelector:
+        role: parser
+        env: prod
+      containers:
+      - name: system-logs-container
+        image: matvey5686/k8s-app:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            memory: 512Mi

@@ -1,0 +1,69 @@
+apiVersion: v1 # Версия API для PersistentVolume
+kind: PersistentVolume # Тип ресурса - постоянный том
+metadata:
+  # Метаданные PV
+  name: local-pv # Имя постоянного тома
+  labels:
+    # Метки для идентификации
+    type: local # Тип тома - локальный
+spec:
+  # Спецификация PV
+  storageClassName: "" # Класс хранилища для связывания с PVC
+  capacity:
+    # Емкость хранилища
+    storage: 5Gi # Размер хранилища - 1 гигабайт
+  accessModes:
+  # Режимы доступа к тому
+  - ReadWriteOnce # Чтение-запись только одним узлом
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - master-95.143.191.163
+          - master-80.249.131.177
+  volumeMode: Filesystem
+  local:
+    path: /var/pv
+---
+apiVersion: v1 # Версия API для PersistentVolumeClaim
+kind: PersistentVolumeClaim # Тип ресурса - запрос на постоянный том
+metadata:
+  # Метаданные PVC
+  name: local-pvc # Имя запроса на том
+spec:
+  # Спецификация PVC 
+  storageClassName: "" # Класс хранилища (должен совпадать с PV)
+  accessModes:
+  # Режимы доступа к тому
+  - ReadWriteOnce # Чтение-запись только одним узлом
+  resources:
+    # Требования к ресурсам
+    requests:
+      # Запрашиваемые ресурсы
+      storage: 1Gi # Запрашиваемый размер хранилища
+
+# ---
+# # Пример Pod с emptyDir (не PV)
+# apiVersion: v1 # Версия API для Pod
+# kind: Pod # Тип ресурса - Pod
+# metadata:
+#   # Метаданные Pod
+#   name: test-pod # Имя Pod'а
+# spec:
+#   # Спецификация Pod
+#   containers:
+#   # Список контейнеров в Pod
+#   - name: test-container # Первый контейнер
+#     image: nginx # Образ контейнера
+#     volumeMounts:
+#     # Точки монтирования томов
+#     - name: pv-volume # Монтирование PV тома
+#       mountPath: /cache # Путь монтирования внутри контейнера
+#   volumes:
+#   - name: pv-volume # Постоянный том через PVC
+#     persistentVolumeClaim:
+#       # Ссылка на PersistentVolumeClaim
+#       claimName: local-pvc # Имя PVC для использования

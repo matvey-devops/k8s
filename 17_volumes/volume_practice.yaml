@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: volume-practice-deployment
+  labels:
+    app: volume-practice
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: volume-practice
+  template:
+    metadata:
+      labels:
+        app: volume-practice
+      name: volume-practice-pod
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx
+        ports:
+        - name: http
+          containerPort: 80
+        volumeMounts:
+        - name: shared-site-volume
+          mountPath: /usr/share/nginx/html
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+          requests:
+            memory: "64Mi"
+            cpu: "150m"
+      - name: write-busybox-container
+        image: busybox
+        volumeMounts:
+        - name: shared-site-volume
+          mountPath: /failik
+        command: [ "/bin/sh" ]
+        args:
+        - "-c"
+        - "while true; do echo $(date) > /failik/index.html; sleep 1; done"
+        resources:
+          limits:
+            cpu: "100m"
+            memory: "50Mi"
+          requests:
+            memory: "32Mi"
+            cpu: "50m"
+      volumes:
+      - name: shared-site-volume
+        emptyDir: {}

@@ -1,0 +1,48 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: alerts
+  labels:
+    name: alerts
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tg-notification-job
+  namespace: alerts
+  labels:
+    app: telegram-notifier
+spec:
+  completions: 1
+  parallelism: 1
+  template:
+    metadata:
+      labels:
+        app: telegram-notifier
+    spec:
+      containers:
+      - name: telegram-sender
+        image: curlimages/curl:latest
+        env:
+        - name: TG_BOT_TOKEN
+          value: "8095796100:AAFncbUGMh40XAoGrT1B9Utw_gMSN_sWpuo"
+        - name: TG_CHAT_ID
+          value: "-4977278459"
+        - name: MESSAGE
+          value: "k3s cluster is working ✅"
+        command: [ "/bin/sh" ]
+        args:
+        - -c
+        - |
+          curl -X POST "https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage" \
+            -H "Content-Type: application/json" \
+            -d "{\"chat_id\":\"${TG_CHAT_ID}\",\"text\":\"${MESSAGE}\"}"; exit 0
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "50m"
+          limits:
+            memory: "64Mi"
+            cpu: "100m"
+      restartPolicy: OnFailure
